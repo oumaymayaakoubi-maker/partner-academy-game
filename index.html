@@ -1484,6 +1484,13 @@ async function qFinish(){
   } catch(e){}
 }
 const TN_FLAG = '<svg class="tn" viewBox="0 0 30 20" aria-label="Tunisie"><rect width="30" height="20" rx="1.5" fill="#E70013"/><circle cx="15" cy="10" r="6" fill="#fff"/><circle cx="14.6" cy="10" r="4.5" fill="#E70013"/><circle cx="15.9" cy="10" r="3.6" fill="#fff"/><path d="M14.30 10.00 L15.83 9.44 L15.89 7.81 L16.89 9.10 L18.46 8.65 L17.55 10.00 L18.46 11.35 L16.89 10.90 L15.89 12.19 L15.83 10.56Z" fill="#E70013"/></svg>';
+/* flag of the selected country (Pays tab code, e.g. ES); the Tunisian SVG stays for TN or when no country is loaded */
+function countryFlag(){
+  const c = (COUNTRY && COUNTRY.code) ? String(COUNTRY.code).toLowerCase() : "tn";
+  if(c === "tn" || !/^[a-z]{2}$/.test(c)) return TN_FLAG;
+  const nm = esc((COUNTRY && COUNTRY.name) || c);
+  return '<img class="tn" alt="' + nm + '" title="' + nm + '" src="https://flagcdn.com/w40/' + c + '.png" style="object-fit:cover" onerror="this.remove()">';
+}
 function rulesUI(){
   const q = isQuiz();
   $("rules-list").innerHTML = (q ? ["qr1", "qr2", "qr3", "qr4"] : ["rule1", "rule2", "rule3", "rule4", "rule5"]).map((k, i) => `<li><span class="k">${i + 1}</span><span>${t(k)}</span></li>`).join("");
@@ -1491,7 +1498,7 @@ function rulesUI(){
   $("start-title").textContent = t(q ? "qStartTitle" : "startTitle");
   $("b-train").hidden = String(P.training_button) === "0";
   const tn = String(P.tunisia_touch) !== "0", cr = String(P.credit_on) !== "0" && String(P.credit_name || "").trim();
-  $("brand-flag").innerHTML = tn ? TN_FLAG : "";
+  $("brand-flag").innerHTML = (tn || COUNTRY) ? countryFlag() : "";
   const credit = cr ? t("creditLine", {name: esc(P.credit_name), role: esc(P.credit_role || "")}).replace(/ · $/, "") + TN_FLAG : "";
   ["credit-start", "credit-train", "credit-end"].forEach(id => { $(id).hidden = !cr; $(id).innerHTML = credit; });
   $("prize-line").hidden = String(P.prize_on) === "0" || !t("prizeLine").trim(); $("prize-line").textContent = t("prizeLine");
