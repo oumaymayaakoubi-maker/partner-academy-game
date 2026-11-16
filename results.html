@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rush Glovo · Résultats</title>
+<script src="config.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600;700;800&display=swap">
+<style>
+:root{--sun:#FFC244;--pepper:#14221B;--pepper-2:#1F3328;--pepper-3:#2C4637;--mint:#00A082;--mint-soft:#7FD9C4;--chili:#FF5A4E;--cream:#F4F7F5;--mute:#9DB2A6;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--body:"Figtree","Segoe UI",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--pepper);color:var(--cream);font-family:var(--body);padding:24px max(20px,3vw)}
+header{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:6px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,4vw,52px);margin:0;letter-spacing:-.02em}
+h1 span{background:var(--sun);color:var(--pepper);padding:0 10px;border-radius:10px}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;font-weight:800;padding:11px 16px}
+.go{background:var(--sun);color:var(--pepper);font-family:var(--display);font-size:17px}
+.soft{background:var(--pepper-2);color:var(--cream);border:1.5px solid var(--pepper-3)}
+.danger{background:transparent;color:var(--chili);border:1.5px solid var(--chili)}
+.sub{color:var(--mute);margin:4px 0 4px;font-weight:600}
+.rule{color:var(--cream);margin:0 0 20px;font-size:15px;font-weight:600;opacity:.85}
+.grid{display:grid;grid-template-columns:1.2fr 1fr;gap:24px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.eyebrow{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--sun);margin-bottom:10px}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:r}
+li{display:grid;grid-template-columns:48px 1fr auto auto auto;gap:14px;align-items:center;background:var(--pepper-2);border-radius:14px;padding:12px 16px;font-size:clamp(16px,1.6vw,22px);counter-increment:r}
+li::before{content:counter(r);font-family:var(--display);font-weight:800;color:var(--sun);font-size:1.3em}
+li:nth-child(1){background:var(--sun);color:var(--pepper)} li:nth-child(1)::before{color:var(--pepper)}
+li small{opacity:.7}
+.pts{font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums}
+.ps{font-size:.75em;opacity:.75;font-variant-numeric:tabular-nums}
+.cd{font-family:var(--display);font-weight:800;letter-spacing:.14em;font-size:.85em;background:var(--pepper);color:var(--sun);padding:2px 8px;border-radius:8px}
+li:nth-child(1) .cd{background:var(--pepper);color:var(--sun)}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.tile{background:var(--pepper-2);border-radius:14px;padding:14px}
+.tile small{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.tile b{font-family:var(--display);font-size:clamp(22px,2.4vw,34px);font-variant-numeric:tabular-nums}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:10px;align-items:center;font-size:15px}
+.bar .lbl{grid-column:1/-1;font-weight:600}
+.bar .track{height:12px;background:var(--pepper-3);border-radius:99px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--chili);border-radius:99px}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--mute)}
+.insight{margin-top:18px;background:var(--pepper-2);border:1.5px solid var(--sun);border-radius:14px;padding:14px;font-size:16px;line-height:1.45}
+.empty{color:var(--mute);padding:20px;background:var(--pepper-2);border-radius:14px}
+.awards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.aw{background:var(--pepper-2);border-radius:14px;padding:12px 14px;display:grid;gap:2px}
+.aw small{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sun)}
+.aw b{font-family:var(--display);font-size:20px} .aw span{color:var(--mute);font-weight:600;font-size:14px}
+/* full-screen live leaderboard */
+.board{position:fixed;inset:0;z-index:15;background:radial-gradient(circle at 50% 0%,#2C4637,#0c1611 75%);padding:24px max(20px,4vw);display:grid;grid-template-rows:auto 1fr auto;gap:14px;overflow:hidden}
+.board header h2{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(30px,4.2vw,64px)} .board header h2 span{background:var(--sun);color:var(--pepper);padding:0 12px;border-radius:12px}
+.board .live{display:inline-flex;align-items:center;gap:8px;color:var(--mint-soft);font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:14px}
+.board .live::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--chili);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.2}}
+.rows{display:grid;gap:8px;align-content:start;overflow:hidden}
+.row{display:grid;grid-template-columns:64px 1fr auto auto;gap:18px;align-items:center;background:rgba(244,247,245,.06);border-radius:16px;padding:10px 20px;font-size:clamp(18px,2vw,30px);transition:transform .6s,background .6s}
+.row .rk{font-family:var(--display);font-weight:800;font-size:1.3em;color:var(--sun);text-align:center}
+.row .nm{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .row .nm small{font-weight:600;opacity:.65}
+.row .psx{font-variant-numeric:tabular-nums;opacity:.75;font-size:.8em} .row .pt{font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums}
+.row.r1{background:var(--sun);color:var(--pepper)} .row.r1 .rk{color:var(--pepper)}
+.row.r2{background:#E6EAE8;color:var(--pepper)} .row.r2 .rk{color:var(--pepper)}
+.row.r3{background:#E8A46A;color:var(--pepper)} .row.r3 .rk{color:var(--pepper)}
+.row.up{animation:flash 1.6s ease-out} @keyframes flash{0%{box-shadow:0 0 0 4px var(--mint-soft)}100%{box-shadow:0 0 0 0 transparent}}
+.board footer{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;justify-content:space-between;color:var(--mute);font-weight:700}
+.ticker{color:var(--cream)} .ticker b{color:var(--sun)}
+.toast2{position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:16;background:var(--sun);color:var(--pepper);font-family:var(--display);font-weight:800;font-size:clamp(26px,3.4vw,54px);padding:18px 30px;border-radius:20px;box-shadow:0 20px 60px -20px #000;text-align:center}
+/* podium reveal */
+.podium{position:fixed;inset:0;z-index:20;background:radial-gradient(circle at 50% 30%,#2C4637,#0c1611 70%);display:grid;grid-template-rows:auto 1fr auto;padding:28px;gap:16px}
+.podium h2{margin:0;text-align:center;font-family:var(--display);font-weight:800;font-size:clamp(28px,4vw,56px);color:var(--sun)}
+.steps{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:end;gap:18px;max-width:1100px;width:100%;margin:0 auto}
+.step{display:grid;gap:10px;text-align:center;transition:opacity .5s,transform .5s}
+.step.hide{opacity:0;transform:translateY(30px)}
+.step .who{font-family:var(--display);font-weight:800;font-size:clamp(20px,2.6vw,38px);line-height:1.1}
+.step .resto{color:var(--mute);font-weight:700;font-size:clamp(14px,1.4vw,20px)}
+.step .score{font-variant-numeric:tabular-nums;font-weight:800;font-size:clamp(16px,1.6vw,24px)}
+.step .code{font-family:var(--display);font-weight:800;letter-spacing:.18em;font-size:clamp(18px,2vw,30px);color:var(--sun)}
+.block{border-radius:16px 16px 0 0;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:clamp(40px,6vw,96px);color:var(--pepper)}
+.s1 .block{height:clamp(160px,30vh,320px);background:var(--sun)} .s2 .block{height:clamp(110px,21vh,230px);background:#E6EAE8} .s3 .block{height:clamp(80px,15vh,170px);background:#E8A46A}
+.podium .nav{display:flex;justify-content:center;gap:10px}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:21}
+.credit{position:fixed;right:16px;bottom:10px;z-index:1000;font-size:12px;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:.02em;pointer-events:none}
+.credit b{color:#FFC244;font-weight:800}
+.credit .tn{display:inline-block;width:18px;height:12px;vertical-align:-1px;margin-inline-start:6px;border-radius:2px}
+</style></head>
+<body>
+<header>
+  <h1>Rush <span>Glovo</span> · résultats</h1>
+  <div class="actions">
+    <button class="go" id="b-board">Classement plein écran</button>
+    <button class="go" id="b-podium">Révéler le podium</button>
+    <button class="soft" id="b-codes" aria-pressed="false">Afficher les codes</button>
+    <button class="danger" id="b-stop">Arrêter le classement</button>
+  </div>
+</header>
+<p class="sub" id="sub">Chargement…</p>
+<div class="credit" id="credit" hidden></div>
+<p class="rule" id="rule"></p>
+<div class="grid">
+  <section><div class="eyebrow">Classement officiel</div><ol id="top"></ol>
+    <div class="eyebrow" id="aw-title" style="margin-top:22px">Prix par catégorie</div><div class="awards" id="awards"></div></section>
+  <section>
+    <div class="eyebrow">La salle en chiffres</div>
+    <div class="tiles" id="tiles"></div>
+    <div class="eyebrow" id="bars-title">Erreurs moyennes par partie</div>
+    <div class="bars" id="bars"></div>
+    <div class="insight" id="insight" hidden></div>
+  </section>
+</div>
+
+<div class="board" id="board" hidden>
+  <header style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"><h2>Rush <span>Glovo</span> · classement</h2><span class="live">En direct</span></header>
+  <div class="rows" id="rows"></div>
+  <footer><span class="ticker" id="ticker"></span><span><span id="bcount"></span> · <button class="soft" id="b-boardclose">Quitter</button></span></footer>
+</div>
+<div class="toast2" id="leader" hidden></div>
+<div class="podium" id="podium" hidden>
+  <h2 id="pod-title">Et le podium est…</h2>
+  <div class="steps">
+    <div class="step s2 hide" id="p2"><div class="who"></div><div class="resto"></div><div class="score"></div><div class="code"></div><div class="block">2</div></div>
+    <div class="step s1 hide" id="p1"><div class="who"></div><div class="resto"></div><div class="score"></div><div class="code"></div><div class="block">1</div></div>
+    <div class="step s3 hide" id="p3"><div class="who"></div><div class="resto"></div><div class="score"></div><div class="code"></div><div class="block">3</div></div>
+  </div>
+  <div class="nav"><button class="go" id="b-next">Révéler la 3e place</button><button class="soft" id="b-close">Fermer</button></div>
+</div>
+<canvas id="confetti" hidden></canvas>
+
+<script>
+const $ = id => document.getElementById(id);
+const pct = x => Math.round(x * 100) + ' %';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let KEY = '', LAST = null, SHOWCODES = false;
+const GS = (typeof google !== 'undefined' && google.script && google.script.run) ? google.script.run : null;
+const ENDPOINT = (window.RUSH_ENDPOINT || '').trim();
+function fail(m){ $('sub').textContent = m; }
+function api(name, fnName){
+  return new Promise((res, rej) => {
+    if(GS) return GS.withSuccessHandler(res).withFailureHandler(rej)[fnName](KEY);
+    if(!ENDPOINT) return rej(new Error('Lien du script manquant : renseignez RUSH_ENDPOINT dans config.js.'));
+    fetch(ENDPOINT + '?api=' + name + '&key=' + encodeURIComponent(KEY)).then(r => r.json())
+      .then(d => d.error ? rej(new Error(d.error === 'Clé invalide' ? 'Clé de résultats invalide : vérifiez ?key= dans le lien.' : d.error)) : res(d)).catch(() => rej(new Error('Connexion au script impossible. Nouvel essai dans 10 s…')));
+  });
+}
+function load(){ api('stats', 'getStats').then(render).catch(e => fail(e.message)); }
+const fmt = iso => iso ? new Date(iso).toLocaleString('fr-FR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) : '';
+let PREV = {}, LEADER = null;
+const isQ = s => !!(s && s.quiz && s.quiz.players > 0);
+const sec = ms => (Number(ms) / 1000).toFixed(1).replace('.', ',') + ' s';
+const scoreOf = x => x.answerMs ? `${x.points}/${x.totalQ}` : x.points;
+const sideOf = x => x.answerMs ? sec(x.answerMs) : 'PS ' + x.partnerScore;
+const TN_FLAG = '<svg class="tn" viewBox="0 0 30 20" aria-label="Tunisie"><rect width="30" height="20" rx="1.5" fill="#E70013"/><circle cx="15" cy="10" r="6" fill="#fff"/><circle cx="14.6" cy="10" r="4.5" fill="#E70013"/><circle cx="15.9" cy="10" r="3.6" fill="#fff"/><path d="M14.30 10.00 L15.83 9.44 L15.89 7.81 L16.89 9.10 L18.46 8.65 L17.55 10.00 L18.46 11.35 L16.89 10.90 L15.89 12.19 L15.83 10.56Z" fill="#E70013"/></svg>';
+function render(s){
+  LAST = s; renderBoard(s); renderAwards(s);
+  if(s.credit && s.credit.name){ $('credit').hidden = false; $('credit').innerHTML = `Développé par <b>${esc(s.credit.name)}</b>${s.credit.role ? ' · ' + esc(s.credit.role) : ''}${TN_FLAG}`; } else $('credit').hidden = true;
+  $('sub').textContent = `${s.players} joueurs classés · ${s.games} parties jouées${s.practiceGames ? ` dont ${s.practiceGames} d'entraînement` : ''} · mis à jour ${new Date(s.updated).toLocaleTimeString('fr-FR')}`;
+  const r = s.rule || {mode:'first'};
+  $('rule').textContent = (r.mode === 'best' ? 'Règle : la meilleure partie de chaque joueur compte.' : 'Règle : seule la première partie de chaque joueur compte.')
+    + (isQ(s) ? ' Égalité de score : le temps de réponse total le plus court gagne.' : ' Égalité : le meilleur Partner Score gagne, puis la partie jouée en premier.')
+    + (r.from || r.to ? ` Parties prises en compte${r.from ? ' à partir du ' + fmt(r.from) : ''}${r.to ? " jusqu'au " + fmt(r.to) : ''}.` : '');
+  $('top').innerHTML = s.top.length ? s.top.map(x => `<li><span>${esc(x.nickname)} <small>· ${esc(x.restaurant)}</small></span>${SHOWCODES ? `<span class="cd">${esc(x.code || '—')}</span>` : '<span></span>'}<span class="ps">${sideOf(x)}</span><span class="pts">${scoreOf(x)}</span></li>`).join('') : '<div class="empty">Aucune partie officielle pour le moment. Scannez le QR code pour jouer.</div>';
+  $('awards').hidden = $('aw-title').hidden = isQ(s);
+  if(isQ(s)){
+    const q = s.quiz, n = (s.top[0] && s.top[0].totalQ) || (q.questions || []).length, flawless = s.top.filter(x => x.answerMs && x.points >= x.totalQ).length;
+    const qs = (q.questions || []).slice().sort((a, b) => b.wrongShare - a.wrongShare);
+    $('tiles').innerHTML = [['Joueurs', q.players], ['Score moyen', q.avgCorrect.toFixed(1).replace('.', ',') + '/' + n], ['Temps moyen', sec(q.avgMs)],
+      ['Sans faute', flawless], ['Question la plus ratée', qs[0] ? Math.round(qs[0].wrongShare * 100) + ' %' : '—'], ['Bonnes réponses', pct(n ? q.avgCorrect / n : 0)]]
+      .map(([l, v]) => `<div class="tile"><small>${l}</small><b>${v}</b></div>`).join('');
+    $('bars-title').textContent = 'Taux d\'erreur par situation (à réexpliquer en haut de liste)';
+    $('bars').innerHTML = qs.map(x => `<div class="bar"><span class="lbl">${esc(x.scene || x.question)} <small style="color:var(--mute)">· ${esc(x.answer)}</small></span><div class="track"><i style="width:${x.wrongShare * 100}%"></i></div><span class="v">${Math.round(x.wrongShare * 100)} %</span></div>`).join('');
+    const ins = $('insight');
+    if(qs[0] && qs[0].wrongShare > 0){ ins.hidden = false; ins.innerHTML = `À réexpliquer sur scène : <b>${esc(qs[0].scene)}</b><br>${Math.round(qs[0].wrongShare * 100)} % se sont trompés. Bonne réponse : <b>${esc(qs[0].answer)}</b>`; }
+    else ins.hidden = true;
+    return;
+  }
+  $('bars-title').textContent = 'Erreurs moyennes par partie';
+  const tiles = [
+    ['Partner Score moyen', Math.round(s.avgPartnerScore)], ['Points moyens', Math.round(s.avgPoints)], ['Uptime ≥ 95 %', pct(s.uptimeOk)],
+    ['Annulations ≤ 2 %', pct(s.cancelOk)], ['Ont lancé des Ads', pct(s.adsShare)], ['Ont lancé une promo', pct(s.usedPromo || 0)], ['Ont sauvé une vente', pct(s.savedSales)],
+    ['Ont appelé le support', pct(s.calledSupport || 0)], ['Ont fermé correctement', pct(s.closedOk || 0)], ['Ont utilisé Forte demande', pct(s.usedBusy || 0)]
+  ];
+  $('tiles').innerHTML = tiles.map(([l, v]) => `<div class="tile"><small>${l}</small><b>${v}</b></div>`).join('');
+  const m = s.mistakes, items = [
+    ['Tickets expirés (non acceptés)', m.missed], ['Annulations pour rupture', m.stockCancels],
+    ['Réclamations client', m.complaints], ['Pizzas sorties crues', m.raw], ['Pizzas brûlées', m.burnt],
+    ['Coursiers qui ont attendu', m.courierWaits], ['Annulées par le client (retard)', m.lateCancels],
+    ['Remises à un coursier sans sac', m.badHandovers || 0], ['Annulées car parti sans fermer', m.leftOpenCancels || 0]
+  ].sort((a, b) => b[1] - a[1]);
+  const max = Math.max(1, ...items.map(x => x[1]));
+  $('bars').innerHTML = items.map(([l, v]) => `<div class="bar"><span class="lbl">${l}</span><div class="track"><i style="width:${v / max * 100}%"></i></div><span class="v">${v.toFixed(1)}</span></div>`).join('');
+  const ins = $('insight');
+  if(s.nHigh && s.nLow){ ins.hidden = false; ins.innerHTML = `Ads lancées avec un Partner Score ≥ 75 : ROAS moyen <b>${s.roasHigh.toFixed(1)}</b> · avec un score &lt; 75 : <b>${s.roasLow.toFixed(1)}</b>. Les opérations d'abord, la visibilité ensuite.`; }
+  else ins.hidden = true;
+}
+const AWARDS = [['partnerScore', 'Meilleur Partner Score', v => 'PS ' + v], ['sales', 'Plus de ventes', v => v + ' TND'], ['service', 'Service le plus propre', v => 'zéro faute en salle'],
+  ['roas', 'Meilleur retour Ads', v => 'ROAS ' + v], ['reflexes', 'Meilleurs réflexes', v => v + ' bon(s) réflexe(s)']];
+function renderAwards(s){
+  const a = s.awards || {};
+  $('awards').innerHTML = AWARDS.map(([k, lbl, f]) => { const w = a[k]; return `<div class="aw"><small>${lbl}</small>${w ? `<b>${esc(w.nickname)}</b><span>${[esc(w.restaurant), k === 'service' ? '' : esc(f(w.value)), SHOWCODES && w.code ? esc(w.code) : ''].filter(Boolean).join(' · ')}</span>` : '<span>Pas encore de gagnant</span>'}</div>`; }).join('');
+}
+function renderBoard(s){
+  const rows = s.top.slice(0, 12);
+  const html = rows.map((x, i) => { const key = (x.nickname + '|' + x.restaurant).toLowerCase(); const moved = PREV[key] !== undefined && PREV[key] > i;
+    return `<div class="row ${i < 3 ? 'r' + (i + 1) : ''} ${moved ? 'up' : ''}"><span class="rk">${i + 1}</span><span class="nm">${esc(x.nickname)} <small>· ${esc(x.restaurant)}</small></span><span class="psx">${sideOf(x)}</span><span class="pt">${scoreOf(x)}</span></div>`; }).join('');
+  $('rows').innerHTML = html || '<div class="empty" style="font-size:24px">En attente des premières parties… Scannez le QR code pour jouer !</div>';
+  const nl = rows[0] ? (rows[0].nickname + '|' + rows[0].restaurant).toLowerCase() : null;
+  if(LEADER && nl && nl !== LEADER && !$('board').hidden){ $('leader').textContent = 'Nouveau leader : ' + rows[0].nickname + ' !'; $('leader').hidden = false; tone([659, 784, 1047]); setTimeout(() => $('leader').hidden = true, 4000); }
+  LEADER = nl; PREV = {}; rows.forEach((x, i) => PREV[(x.nickname + '|' + x.restaurant).toLowerCase()] = i);
+  const rc = (s.recent || [])[0];
+  $('ticker').innerHTML = rc ? `Dernière partie : <b>${esc(rc.nickname)}</b> · ${esc(rc.restaurant)} · ${rc.points} ${isQ(s) ? 'bonne(s) réponse(s)' : 'points'}` : '';
+  $('bcount').textContent = `${s.players} joueurs classés`;
+}
+$('b-board').onclick = () => { $('board').hidden = false; try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); } catch(e){} };
+$('b-boardclose').onclick = () => { $('board').hidden = true; try { document.fullscreenElement && document.exitFullscreen(); } catch(e){} };
+$('b-codes').onclick = () => { SHOWCODES = !SHOWCODES; $('b-codes').setAttribute('aria-pressed', SHOWCODES); $('b-codes').textContent = SHOWCODES ? 'Masquer les codes' : 'Afficher les codes'; if(LAST) render(LAST); };
+
+/* stop: two clicks, no browser dialog */
+let stopArmed = 0;
+$('b-stop').onclick = () => {
+  if(Date.now() - stopArmed > 4000){ stopArmed = Date.now(); $('b-stop').textContent = 'Confirmer l’arrêt ?'; setTimeout(() => { if(Date.now() - stopArmed >= 4000) $('b-stop').textContent = 'Arrêter le classement'; }, 4100); return; }
+  stopArmed = 0; $('b-stop').textContent = 'Arrêt…';
+  api('stop', 'stopCompetition').then(r => { $('b-stop').textContent = 'Classement arrêté à ' + r.stoppedAt.slice(11, 16); load(); })
+    .catch(e => { $('b-stop').textContent = 'Arrêter le classement'; fail(e.message); });
+};
+
+/* podium: 3rd, then 2nd, then 1st */
+let podStep = 0;
+function fillStep(id, x){
+  const el = $(id); if(!x){ el.querySelector('.who').textContent = '—'; return; }
+  el.querySelector('.who').textContent = x.nickname; el.querySelector('.resto').textContent = x.restaurant;
+  el.querySelector('.score').textContent = x.answerMs ? `${x.points}/${x.totalQ} bonnes réponses · ${sec(x.answerMs)}` : `${x.points} points · PS ${x.partnerScore}`; el.querySelector('.code').textContent = x.code ? 'Code ' + x.code : '';
+}
+$('b-podium').onclick = () => {
+  if(!LAST || !LAST.top.length) return fail('Pas encore de partie officielle à mettre sur le podium.');
+  const t = LAST.top; fillStep('p1', t[0]); fillStep('p2', t[1]); fillStep('p3', t[2]);
+  ['p1','p2','p3'].forEach(id => $(id).classList.add('hide')); podStep = 0;
+  $('pod-title').textContent = 'Et le podium est…'; $('b-next').textContent = 'Révéler la 3e place'; $('podium').hidden = false;
+};
+$('b-next').onclick = () => {
+  podStep++;
+  if(podStep === 1){ $('p3').classList.remove('hide'); $('b-next').textContent = 'Révéler la 2e place'; tone([523, 659]); }
+  else if(podStep === 2){ $('p2').classList.remove('hide'); $('b-next').textContent = 'Révéler le gagnant'; tone([587, 740]); }
+  else if(podStep === 3){ $('p1').classList.remove('hide'); $('pod-title').textContent = 'Bravo ' + (LAST.top[0] ? LAST.top[0].nickname : '') + ' !'; $('b-next').hidden = true; tone([523, 659, 784, 1047]); confetti(); }
+};
+$('b-close').onclick = () => { $('podium').hidden = true; $('b-next').hidden = false; $('confetti').hidden = true; };
+document.addEventListener('keydown', e => { if(!$('podium').hidden && (e.key === ' ' || e.key === 'ArrowRight') && !$('b-next').hidden){ e.preventDefault(); $('b-next').click(); } });
+
+let actx;
+function tone(fs){ try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); fs.forEach((f, i) => { const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * .14;
+  o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.3, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + (i === fs.length - 1 ? .8 : .2)); o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + 1); }); } catch(e){} }
+function confetti(){
+  const cv = $('confetti'), c = cv.getContext('2d'); cv.hidden = false; cv.width = innerWidth; cv.height = innerHeight;
+  const cols = ['#FFC244', '#00A082', '#FF5A4E', '#F4F7F5', '#7FD9C4'];
+  const ps = Array.from({length: 220}, () => ({x: Math.random() * cv.width, y: -20 - Math.random() * cv.height * .5, vx: (Math.random() - .5) * 3, vy: 2 + Math.random() * 4, r: 4 + Math.random() * 6, a: Math.random() * 6, col: cols[Math.floor(Math.random() * cols.length)]}));
+  const t0 = performance.now();
+  (function f(now){ c.clearRect(0, 0, cv.width, cv.height);
+    ps.forEach(p => { p.x += p.vx; p.y += p.vy; p.a += .1; c.save(); c.translate(p.x, p.y); c.rotate(p.a); c.fillStyle = p.col; c.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); c.restore(); });
+    if(now - t0 < 7000 && !cv.hidden) requestAnimationFrame(f); else cv.hidden = true; })(t0);
+}
+
+if(GS && google.script.url) google.script.url.getLocation(loc => { KEY = (loc.parameter && loc.parameter.key) || ''; if(loc.parameter && loc.parameter.board === '1') $('board').hidden = false; load(); setInterval(load, 5000); });
+else { const q = new URLSearchParams(location.search); KEY = q.get('key') || ''; if(q.get('view') === 'board') $('board').hidden = false; load(); setInterval(load, 5000); }
+</script>
+</body></html>
